@@ -1,0 +1,39 @@
+package:
+  name: mariadb
+  version: 8.0.31
+  epoch: 0
+  description: "MySQL Server, the world's most popular open source database"
+  target-architecture:
+    - all
+  copyright:
+    - paths:
+      - "*"
+      attestation: TODO
+      license: GPL-3.0-or-later
+  dependencies:
+    runtime:
+
+environment:
+  contents:
+    packages:
+      - wolfi-baselayout
+      - busybox
+      - ca-certificates-bundle
+      - build-base
+      - cmake
+      - openssl-dev
+      - ncurses-dev
+      - samurai
+
+pipeline:
+  - uses: fetch
+    with:
+      uri: https://github.com/mysql/mysql-server/archive/refs/tags/mysql-cluster-${{package.version}}.tar.gz
+      expected-sha256: 7c48747f430c78b93e20f7d3ad60535b487e29801bde6a0e4e599b3f9fe7e232
+  - name: 'Build'
+    runs: |
+      cmake -G Ninja . -DFORCE_INSOURCE_BUILD=1
+  - runs: |
+      ninja
+  - runs: |
+       DESTDIR="${{targets.destdir}}" ninja install
